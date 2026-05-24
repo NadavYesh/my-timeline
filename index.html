@@ -206,12 +206,28 @@
   }
 
   @media (max-width: 900px) {
+    body {
+      padding-bottom: 220px; /* space for the fixed detail card */
+    }
     .timeline-wrapper {
-      height: 480px;
-      overflow-x: auto;
+      height: auto;
+      min-height: 480px;
+      overflow-x: hidden;
     }
     .timeline-wrapper > svg {
-      width: 1200px;
+      width: 100%;
+      height: auto;
+    }
+    .detail-card {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
+      border-radius: 16px;
     }
   }
 </style>
@@ -222,7 +238,7 @@
 
   <div class="intro">
     <h2>NADAV YESHAYAHU</h2>
-    <p>Fill free to go over my journey!</p>
+    <p>Enjoy my career path!</p>
   </div>
 
   <div class="filters">
@@ -276,45 +292,45 @@
   };
 
   const events = [
-    {cat:"work", title:"Data Analyst — PM Office", date:"Nov 2016 – Apr 2019",
+    {cat:"work", title:"Data & Automation Analyst — PMO", shortTitle: "Data Analyst", date:"Nov 2016 – Apr 2019",
      startT: new Date("2016-11-01").getTime(), endT: new Date("2019-04-01").getTime(),
      desc:"Integrated Palantir and automated reporting pipelines, achieving 100% adoption while accelerating processing by 60% and saving ~30 analyst-hours daily.", long:true},
 
-    {cat:"edu", title:"Big Data (Palantir Foundry)", date:"Jan 2018",
+    {cat:"edu", title:"Big Data (Palantir Foundry)", shortTitle: "Palantir", date:"Jan 2018",
      startT: new Date("2018-01-15").getTime(), endT: new Date("2018-01-15").getTime(),
      desc:"Hands-on big data course using Palantir Foundry; completed with excellence.", long:false},
 
-    {cat: "edu", title: "Rimon Music School – Music Production", date: "Sep 2020 – Jul 2021",
+    {cat: "edu", title: "Rimon Music School – Music Production", shortTitle: "Music Production", date: "Sep 2020 – Jul 2021",
      startT: new Date("2020-09-01").getTime(), endT: new Date("2021-07-01").getTime(),
      desc: "Music Production in Tel Aviv IL", long: true},
 
-    {cat:"edu", title:"BSc Econometrics & Operations Research — RUG", date:"Sep 2021 – Nov 2024",
+    {cat:"edu", title:"BSc Econometrics & Operations Research — RUG", shortTitle: "BSc Econometrics", date:"Sep 2021 – Nov 2024",
      startT: new Date("2021-09-01").getTime(), endT: new Date("2024-11-01").getTime(),
      desc:"Thesis: Container Sequencing in Temporary Hubs - Cargo Bike Logistics", long:true},
 
-    {cat:"work", title:"Teaching Assistant — RUG", date:"Dec 2022 – Mar 2023",
+    {cat:"work", title:"Teaching Assistant — RUG", shortTitle: "Teaching Assistant", date:"Dec 2022 – Mar 2023",
      startT: new Date("2022-12-01").getTime(), endT: new Date("2023-03-01").getTime(),
      desc:"Transformed handwritten lecture notes into clear LaTeX slides; improved student satisfaction and attendance.", long:true},
 
-    {cat:"work", title:"Founder — commgro.com", date:"Aug 2024 – Aug 2025",
+    {cat:"work", title:"Founder — commgro.com", shortTitle: "Founder", date:"Aug 2024 – Aug 2025",
      startT: new Date("2024-08-01").getTime(), endT: new Date("2025-08-01").getTime(),
      desc:"Founded an online creators community-building platform connecting fans and students with creators (e.g., filmmaking tutorials) on skool.com", long:true},
 
-    {cat:"edu", title:"SQL for Data Science — IBM (edX)", date:"30 Sep 2025",
+    {cat:"edu", title:"SQL for Data Science — IBM", shortTitle: "SQL", date:"30 Sep 2025",
      startT: new Date("2025-09-30").getTime(), endT: new Date("2025-09-30").getTime(),
      desc:`Completed with certification.<br><a href="https://www.credly.com/badges/50f596d6-b204-4560-b210-a4e689f6ce4e" target="_blank">Certificate link</a>`, long:false},
 
-    {cat:"edu", title:"MSc Business Analytics and Data Science — UvA", date:"Sep 2025 – Present",
+    {cat:"edu", title:"MSc Business Analytics and Data Science — UvA", shortTitle: "MSc Data Science", date:"Sep 2025 – Present",
      startT: new Date("2025-09-01").getTime(), endT: new Date("2026-06-30").getTime(),
      desc:"Thesis: Optimizing Retrieval Pipelines for Financial RAG", long:true},
 
-    {cat:"work", title:"Intern Cognitive Data Scientist, IFF", date:"Feb 2026 – Present",
+    {cat:"work", title:"Intern Cognitive Data Scientist, IFF", shortTitle: "Data Science Intern", date:"Feb 2026 – Present",
      startT: new Date("2026-02-01").getTime(), endT: new Date("2026-06-30").getTime(),
      desc:"Business Automation of statistical pipelines; using Python, R, and VBA", long:true},
 
-    {cat: "edu", title: "Python Object-Oriented Programming", date: "Feb 2026",
+    {cat: "edu", title: "Python OOP", shortTitle: "Python OOP", date: "Feb 2026",
      startT: new Date("2026-02-15").getTime(), endT: new Date("2026-02-15").getTime(),
-     desc: `I refreshed my OOP skills! <br><a href="https://www.linkedin.com/learning/certificates/28a51bf008bb33bb2d79216bc987352ceff073a900db8c9eaa3ad331bec2e7b0" target="_blank">Certificate link</a>`, long: false}
+     desc: `Object Oriented Programming course. <br><a href="https://www.linkedin.com/learning/certificates/28a51bf008bb33bb2d79216bc987352ceff073a900db8c9eaa3ad331bec2e7b0" target="_blank">Certificate link</a>`, long: false}
   ];
 
   const minYear = 2016;
@@ -333,14 +349,11 @@
   }
   const T = Array.from(allDates).sort((a,b) => a - b).filter(t => t >= minTime && t <= maxTime);
 
-  const blend = 0.45; // slightly more linear bias
+  // Adjust blend to balance realistic time gaps vs uniform event spacing
+  const blend = 0.65; // Higher ordinal bias = more uniform spacing for events
   const mappedM = T.map((t, i) => {
-    const Lraw = (t - minTime) / (maxTime - minTime);
-    // EXPAND later years: Math.pow with > 1 pushes early years into a shorter space
-    const L = Math.pow(Lraw, 1.6);
-    
-    // Slight ordinal adjustment to help bunchings
-    const O = Math.pow(i / (T.length - 1), 1.15);
+    const L = (t - minTime) / (maxTime - minTime); // True chronological time
+    const O = i / (T.length - 1);                  // Pure event sequence (ordinal)
     
     return blend * O + (1 - blend) * L;
   });
@@ -357,134 +370,187 @@
     return 1;
   }
 
-  // Draw Horizontal Snake path (Left to Right)
-  const svgWidth = 1200;
-  const svgHeight = 460;
-  const padX = 60;
-  const padY = 60;
-  const cols = 9; 
-  const colW = (svgWidth - 2 * padX) / (cols - 1);
-  let d = `M ${padX} ${padY}`;
-  let downward = true;
-  let x = padX;
-  const r = colW / 2;
-
-  for (let i = 0; i < cols; i++) {
-    const yDest = downward ? svgHeight - padY : padY;
-    if (i < cols - 1) {
-      const yLineEnd = downward ? yDest - r : yDest + r;
-      d += ` L ${x} ${yLineEnd}`;
-      
-      if (downward) {
-        // Curve to the Right
-        d += ` A ${r} ${r} 0 0 0 ${x + r} ${yDest}`;
-        d += ` A ${r} ${r} 0 0 0 ${x + 2*r} ${yDest - r}`;
-      } else {
-        // Curve to the Right
-        d += ` A ${r} ${r} 0 0 1 ${x + r} ${yDest}`;
-        d += ` A ${r} ${r} 0 0 1 ${x + 2*r} ${yDest + r}`;
-      }
-      x += colW;
-    } else {
-      d += ` L ${x} ${yDest}`;
-    }
-    downward = !downward;
-  }
-
+  const timelineSVG = document.getElementById("timeline-svg");
   const basePath = document.getElementById("base-path");
   const hlPath = document.getElementById("hl-path");
-  basePath.setAttribute("d", d);
-  hlPath.setAttribute("d", d);
-
-  const totalLength = basePath.getTotalLength();
-
   const timeline = document.getElementById("timeline");
   const yearGroup = document.getElementById("year-group");
-  const dots = [];
-  const labels = [];
+  
+  let totalLength = 0;
+  let dots = [];
+  let labels = [];
   let selectedIndex = null;
 
-  // Add Year indicators & small arrows
-  for(let yr = minYear; yr <= maxYear - 1; yr++) {
-    const t = new Date(`${yr}-01-01`).getTime();
-    if(t >= minTime && t <= maxTime) {
-      const rRatio = timeToRatio(t);
-      const pt = basePath.getPointAtLength(rRatio * totalLength);
+  function renderTimeline() {
+    yearGroup.innerHTML = "";
+    dots.forEach(d => d.remove());
+    labels.forEach(l => l.remove());
+    dots = [];
+    labels = [];
+
+    const isMobile = window.innerWidth <= 900;
+    let d = "";
+    let svgWidth, svgHeight;
+    
+    if (isMobile) {
+      let padding = 30;
+      svgWidth = timeline.clientWidth || window.innerWidth;
+      if (svgWidth < 300) svgWidth = 300;
       
-      const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      txt.setAttribute("x", pt.x);
-      txt.setAttribute("y", pt.y);
-      txt.setAttribute("class", "year-mark");
-      txt.setAttribute("text-anchor", "middle");
-      txt.setAttribute("dominant-baseline", "central");
-      txt.textContent = yr;
-      yearGroup.appendChild(txt);
+      const rows = 12;
+      const rowSpacing = 90;
+      svgHeight = padding * 2 + (rows - 1) * rowSpacing;
+      timelineSVG.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
       
-      // Put a small arrow next to it for direction
-      if (yr > minYear && yr < maxYear - 1) {
-        const arr = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        arr.setAttribute("d", "M -5 -4 L 4 0 L -5 4 Z");
-        arr.setAttribute("fill", "#64748b");
-        
-        let arrDist = rRatio * totalLength + 30; // slightly after the year
-        if (arrDist > totalLength) arrDist = rRatio * totalLength - 30;
-        
-        const arrPt = basePath.getPointAtLength(arrDist);
-        const arrPt2 = basePath.getPointAtLength(arrDist + 1);
-        const arrAng = Math.atan2(arrPt2.y - arrPt.y, arrPt2.x - arrPt.x) * 180 / Math.PI;
-        
-        arr.setAttribute("transform", `translate(${arrPt.x}, ${arrPt.y}) rotate(${arrAng})`);
-        yearGroup.appendChild(arr);
+      const r = rowSpacing / 2;
+      let y = svgHeight - padding;
+      let rightward = true;
+      
+      d = `M ${padding} ${y}`;
+      
+      for (let i = 0; i < rows; i++) {
+        const xDest = rightward ? svgWidth - padding : padding;
+        if (i < rows - 1) {
+          const xLineEnd = rightward ? xDest - r : xDest + r;
+          d += ` L ${xLineEnd} ${y}`;
+          
+          if (rightward) {
+            d += ` A ${r} ${r} 0 0 0 ${xDest} ${y - r}`;
+            d += ` A ${r} ${r} 0 0 0 ${xDest - r} ${y - 2*r}`;
+          } else {
+            d += ` A ${r} ${r} 0 0 1 ${xDest} ${y - r}`;
+            d += ` A ${r} ${r} 0 0 1 ${xDest + r} ${y - 2*r}`;
+          }
+          y -= rowSpacing;
+        } else {
+          d += ` L ${xDest} ${y}`;
+        }
+        rightward = !rightward;
+      }
+    } else {
+      svgWidth = 1200;
+      svgHeight = 460;
+      timelineSVG.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
+      
+      const padX = 60;
+      const padY = 60;
+      const cols = 9; 
+      const colW = (svgWidth - 2 * padX) / (cols - 1);
+      
+      let x = padX;
+      let downward = true;
+      const r = colW / 2;
+      
+      d = `M ${padX} ${padY}`;
+      for (let i = 0; i < cols; i++) {
+        const yDest = downward ? svgHeight - padY : padY;
+        if (i < cols - 1) {
+          const yLineEnd = downward ? yDest - r : yDest + r;
+          d += ` L ${x} ${yLineEnd}`;
+          
+          if (downward) {
+            d += ` A ${r} ${r} 0 0 0 ${x + r} ${yDest}`;
+            d += ` A ${r} ${r} 0 0 0 ${x + 2*r} ${yDest - r}`;
+          } else {
+            d += ` A ${r} ${r} 0 0 1 ${x + r} ${yDest}`;
+            d += ` A ${r} ${r} 0 0 1 ${x + 2*r} ${yDest + r}`;
+          }
+          x += colW;
+        } else {
+          d += ` L ${x} ${yDest}`;
+        }
+        downward = !downward;
       }
     }
+  
+    basePath.setAttribute("d", d);
+    hlPath.setAttribute("d", d);
+    totalLength = basePath.getTotalLength();
+    
+    for(let yr = minYear; yr <= maxYear - 1; yr++) {
+      const t = new Date(`${yr}-01-01`).getTime();
+      if(t >= minTime && t <= maxTime) {
+        const rRatio = timeToRatio(t);
+        const pt = basePath.getPointAtLength(rRatio * totalLength);
+        
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", pt.x);
+        txt.setAttribute("y", isMobile ? pt.y - 12 : pt.y);
+        txt.setAttribute("class", "year-mark");
+        txt.setAttribute("text-anchor", "middle");
+        txt.setAttribute("dominant-baseline", "central");
+        txt.textContent = yr;
+        yearGroup.appendChild(txt);
+        
+        if (yr > minYear && yr < maxYear - 1) {
+          const arr = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          arr.setAttribute("d", "M -5 -4 L 4 0 L -5 4 Z");
+          arr.setAttribute("fill", "#64748b");
+          
+          let arrDist = rRatio * totalLength + 30; 
+          if (arrDist > totalLength) arrDist = rRatio * totalLength - 30;
+          
+          const arrPt = basePath.getPointAtLength(arrDist);
+          const arrPt2 = basePath.getPointAtLength(arrDist + 1);
+          const arrAng = Math.atan2(arrPt2.y - arrPt.y, arrPt2.x - arrPt.x) * (180 / Math.PI);
+          
+          arr.setAttribute("transform", `translate(${arrPt.x}, ${arrPt.y}) rotate(${arrAng})`);
+          yearGroup.appendChild(arr);
+        }
+      }
+    }
+    
+    events.forEach((ev, i) => {
+      const rStart = timeToRatio(ev.startT);
+      const pt = basePath.getPointAtLength(rStart * totalLength);
+
+      const dot = document.createElement("div");
+      dot.className = `event-dot dot-${ev.cat}` + (ev.long ? " long" : "");
+      dot.style.left = (pt.x / svgWidth * 100) + "%";
+      dot.style.top  = (pt.y / svgHeight * 100) + "%";
+      dot.dataset.index = i;
+      dot.dataset.cat   = ev.cat;
+
+      const label = document.createElement("div");
+      label.className = "event-label";
+      label.style.left = (pt.x / svgWidth * 100) + "%";
+      label.style.top  = (pt.y / svgHeight * 100) + "%";
+      
+      if (isMobile) {
+        label.style.transform = "translate(-50%, -36px)";
+        label.style.textAlign = "center";
+        label.style.maxWidth = "110px";
+      } else {
+        const padX = 60;
+        const cols = 9;
+        const colW = (svgWidth - 2 * padX) / (cols - 1);
+        const colIndex = Math.round((pt.x - padX) / colW);
+        if (colIndex % 2 === 1) {
+          label.style.transform = "translate(20px, -50%)";
+        } else {
+          if (colIndex === cols - 1) {
+            label.style.transform = "translate(calc(-100% - 20px), -50%)";
+            label.style.textAlign = "right";
+          } else {
+            label.style.transform = "translate(20px, -50%)";
+          }
+        }
+      }
+      
+      label.innerHTML = ev.shortTitle || ev.title;
+      label.dataset.index = i;
+      label.dataset.cat   = ev.cat;
+
+      timeline.appendChild(dot);
+      timeline.appendChild(label);
+      dots.push(dot);
+      labels.push(label);
+    });
+
+    applyFilters();
+    if (selectedIndex !== null) selectEvent(selectedIndex);
   }
 
-  // place dots + labels
-  events.forEach((ev, i) => {
-    const rStart = timeToRatio(ev.startT);
-    const pt = basePath.getPointAtLength(rStart * totalLength);
-
-    const dot = document.createElement("div");
-    dot.className = `event-dot dot-${ev.cat}` + (ev.long ? " long" : "");
-    dot.style.left = (pt.x / svgWidth * 100) + "%";
-    dot.style.top  = (pt.y / svgHeight * 100) + "%";
-    dot.dataset.index = i;
-    dot.dataset.cat   = ev.cat;
-
-    const label = document.createElement("div");
-    label.className = "event-label";
-    label.style.left = (pt.x / svgWidth * 100) + "%";
-    label.style.top  = (pt.y / svgHeight * 100) + "%";
-    
-    // adjust labels slightly if they fall on an upward stroke, 
-    // to put them on the left side so they don't clip the right edge.
-    // We can infer the column index roughly by tracking X:
-    const colIndex = Math.round((pt.x - padX) / colW);
-    if (colIndex % 2 === 1) {
-      // It's going UP, shift label to the right
-      label.style.transform = "translate(20px, -50%)";
-    } else {
-      // It's going DOWN, shift label to the right
-      // Actually because the snake moves rightward, we always have space on the right (except last col).
-      if (colIndex === cols - 1) {
-        label.style.transform = "translate(calc(-100% - 20px), -50%)";
-        label.style.textAlign = "right";
-      } else {
-        label.style.transform = "translate(20px, -50%)";
-      }
-    }
-    
-    label.innerHTML = ev.title;
-    label.dataset.index = i;
-    label.dataset.cat   = ev.cat;
-
-    timeline.appendChild(dot);
-    timeline.appendChild(label);
-    dots.push(dot);
-    labels.push(label);
-  });
-
-  // detail panel
   const detailDot   = document.getElementById("detail-dot");
   const detailCatLb = document.getElementById("detail-cat-label");
   const detailTitle = document.getElementById("detail-title");
@@ -492,6 +558,7 @@
   const detailDesc  = document.getElementById("detail-desc");
 
   function selectEvent(idx) {
+    if (idx === null) return;
     const ev = events[idx];
     dots.forEach(d => d.classList.remove("active"));
     if (dots[idx]) dots[idx].classList.add("active");
@@ -503,7 +570,6 @@
     detailDate.textContent     = ev.date;
     detailDesc.innerHTML       = ev.desc;
 
-    // highlight segment if long
     if (ev.long) {
       const rStart = timeToRatio(ev.startT);
       const rEnd = timeToRatio(ev.endT);
@@ -520,47 +586,55 @@
     selectedIndex = idx;
   }
 
-  dots.forEach(dot => {
-    dot.addEventListener("click", () => {
-      const idx = parseInt(dot.dataset.index);
-      selectEvent(idx);
-    });
-  });
-
-  labels.forEach(label => {
-    label.addEventListener("click", () => {
-      const idx = parseInt(label.dataset.index);
-      selectEvent(idx);
-    });
-  });
-
-  // filters
   const btns = document.querySelectorAll(".filter-btn");
+
+  function applyFilters() {
+    const activeCats = Array.from(btns)
+      .filter(b => b.classList.contains("active"))
+      .map(b => b.dataset.cat);
+
+    dots.forEach((dot, i) => {
+      const cat = dot.dataset.cat;
+      const shown = activeCats.includes(cat);
+      dot.style.display   = shown ? "block" : "none";
+      if(labels[i]) labels[i].style.display = shown ? "block" : "none";
+    });
+
+    if (selectedIndex !== null && !activeCats.includes(events[selectedIndex].cat)) {
+      if (dots[selectedIndex]) dots[selectedIndex].classList.remove("active");
+      selectedIndex = null;
+      detailDot.style.background = "#4b5563";
+      detailCatLb.textContent = "Event";
+      detailTitle.textContent = "Click an event on the timeline";
+      detailDate.textContent  = "Your roles, degrees and courses will appear here.";
+      detailDesc.textContent  = "Choose a point on the ellipse to see more details.";
+      hlPath.style.opacity = "0";
+    }
+  }
 
   btns.forEach(btn => {
     btn.addEventListener("click", () => {
       btn.classList.toggle("active");
-      const activeCats = Array.from(btns)
-        .filter(b => b.classList.contains("active"))
-        .map(b => b.dataset.cat);
-
-      dots.forEach((dot, i) => {
-        const cat = dot.dataset.cat;
-        const shown = activeCats.includes(cat);
-        dot.style.display   = shown ? "block" : "none";
-        labels[i].style.display = shown ? "block" : "none";
-      });
-
-      if (selectedIndex !== null && !activeCats.includes(events[selectedIndex].cat)) {
-        dots[selectedIndex].classList.remove("active");
-        selectedIndex = null;
-        detailDot.style.background = "#4b5563";
-        detailCatLb.textContent = "Event";
-        detailTitle.textContent = "Click an event on the timeline";
-        detailDate.textContent  = "Your roles, degrees and courses will appear here.";
-        detailDesc.textContent  = "Choose a point on the ellipse to see more details.";
-      }
+      applyFilters();
     });
+  });
+
+  timeline.addEventListener("click", (e) => {
+    const target = e.target;
+    if (target.classList.contains("event-dot") || target.classList.contains("event-label")) {
+      const idx = parseInt(target.dataset.index);
+      selectEvent(idx);
+    }
+  });
+
+  renderTimeline();
+
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      renderTimeline();
+    }, 200);
   });
 </script>
 
