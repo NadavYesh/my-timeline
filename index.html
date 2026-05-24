@@ -15,7 +15,7 @@
     color: #e2e8f0;
     display: flex;
     justify-content: center;
-    padding: 40px 0;
+    padding: 20px 0;
   }
 
   .container {
@@ -26,10 +26,10 @@
 
   /* INTRO */
   .intro {
-    padding: 28px 40px;
+    padding: 20px 40px;
     background: #0f172a;
     border-radius: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
     box-shadow: 0 18px 40px rgba(0,0,0,0.6);
   }
 
@@ -48,7 +48,7 @@
 
   /* FILTERS */
   .filters {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: center;
     gap: 12px;
@@ -75,77 +75,79 @@
     color: #f97316;
     border-color: rgba(249,115,22,0.4);
   }
-  .filter-btn.course {
-    background: rgba(168,85,247,0.18);
-    color: #a855f7;
-    border-color: rgba(168,85,247,0.4);
-  }
 
   .filter-btn.active.edu { background:#38bdf8; color:#020617; }
   .filter-btn.active.work { background:#f97316; color:#020617; }
-  .filter-btn.active.course { background:#a855f7; color:#020617; }
 
   /* TIMELINE AREA */
   .timeline-wrapper {
     position: relative;
-    width: 1000px;
-    max-width: 100%;
-    height: 520px;
-    margin: 0 auto 26px auto;
+    width: 100%;
+    max-width: 1200px;
+    height: 460px; /* modified slightly for screen real estate */
+    margin: 0 auto 20px auto;
   }
 
-  .ellipse-border {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 820px;
-    max-width: 90%;
-    height: 360px;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 3px dashed #4b5563;
-    box-shadow: 0 0 40px rgba(15,23,42,0.9);
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
   }
 
   .event-dot {
     position: absolute;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 999px;
     border: 4px solid #020617;
     transform: translate(-50%, -50%);
     cursor: pointer;
-    box-shadow: 0 0 0 6px rgba(15,23,42,0.8);
+    box-shadow: 0 0 0 5px rgba(15,23,42,0.8);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    z-index: 10;
   }
 
-  /* bigger dots for long events */
   .event-dot.long {
-    width: 30px;
-    height: 30px;
-    box-shadow: 0 0 0 8px rgba(248,250,252,0.15);
+    width: 28px;
+    height: 28px;
+    box-shadow: 0 0 0 6px rgba(248,250,252,0.15);
   }
 
   .event-dot.active {
-    transform: translate(-50%, -50%) scale(1.12);
-    box-shadow: 0 0 0 10px rgba(248,250,252,0.25);
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 0 8px rgba(248,250,252,0.25);
   }
 
   .dot-edu { background:#38bdf8; }
   .dot-work { background:#f97316; }
-  .dot-course { background:#a855f7; }
 
   .event-label {
     position: absolute;
-    width: 190px;
-    font-size: 14px;
+    width: max-content;
+    max-width: 150px;
+    font-size: 13.5px;
     font-weight: 600;
     font-family: 'Poppins', sans-serif;
-    text-align: center;
+    text-align: left;
     color: #f1f5f9;
     pointer-events: auto;
     cursor: pointer;
-    transform: translate(-50%, -50%);
+    transform: translate(20px, -50%); /* Placed to the right of the vertical line */
+    text-shadow: 0 2px 4px #000, 0 0 10px rgba(0,0,0,0.8);
+    z-index: 10;
+  }
+  
+  .year-mark {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    fill: #94a3b8;
+    paint-order: stroke;
+    stroke: #020617;
+    stroke-width: 6px;
+    user-select: none;
+    pointer-events: none;
   }
 
   /* DETAIL PANEL */
@@ -206,10 +208,10 @@
   @media (max-width: 900px) {
     .timeline-wrapper {
       height: 480px;
+      overflow-x: auto;
     }
-    .ellipse-border {
-      width: 90%;
-      height: 320px;
+    .timeline-wrapper > svg {
+      width: 1200px;
     }
   }
 </style>
@@ -224,13 +226,31 @@
   </div>
 
   <div class="filters">
-    <button class="filter-btn edu active" data-cat="edu">Education</button>
+    <button class="filter-btn edu active" data-cat="edu">Education & Courses</button>
     <button class="filter-btn work active" data-cat="work">Work</button>
-    <button class="filter-btn course active" data-cat="course">Courses</button>
   </div>
 
   <div class="timeline-wrapper" id="timeline">
-    <div class="ellipse-border"></div>
+    <svg id="timeline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid meet">
+      <!-- Arrows and Highlights -->
+      <defs>
+        <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+          <polygon points="0 0, 6 3, 0 6" fill="#334155" />
+        </marker>
+        <marker id="arrowhead-hl" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+          <polygon points="0 0, 6 3, 0 6" fill="#f8fafc" />
+        </marker>
+      </defs>
+      
+      <!-- Snake track will be injected here -->
+      <path id="base-path" fill="none" stroke="#334155" stroke-width="6" marker-end="url(#arrowhead)" />
+      
+      <!-- Active Highlight segment -->
+      <path id="hl-path" fill="none" stroke="#f8fafc" stroke-width="12" stroke-linecap="round" style="transition: stroke-dasharray 0.4s ease; opacity: 0;" />
+      
+      <!-- Year indicators injected dynamically -->
+      <g id="year-group"></g>
+    </svg>
   </div>
 
   <div class="detail-card" id="detail-card">
@@ -252,65 +272,208 @@
 <script>
   const catConfig = {
     edu:   { label: "Education", color: "#38bdf8" },
-    work:  { label: "Work",      color: "#f97316" },
-    course:{ label: "Course",    color: "#a855f7" }
+    work:  { label: "Work",      color: "#f97316" }
   };
 
   const events = [
-    {cat: "course",
-    title: "Python Object-Oriented Programming",date: "Feb 2026",desc: `I refreshed my OOP skills! <br><a href="https://www.linkedin.com/learning/certificates/28a51bf008bb33bb2d79216bc987352ceff073a900db8c9eaa3ad331bec2e7b0" target="_blank">Certificate link</a>`,long: false},  
-     {cat:"work", title:"Intern PX Cognitive Data Scientist, IFF", date:"Feb 2026",
-     desc:"Fullstack Automation of statistical pipelines; using Python and R", long:false},
-    {cat:"course", title:"SQL for Data Science — IBM (edX)", date:"30 Sep 2025",
-     desc:`Completed with certification.<br><a href="https://www.credly.com/badges/50f596d6-b204-4560-b210-a4e689f6ce4e" target="_blank">Certificate link</a>`, long:false},
-    {cat:"edu", title:"MSc Data Science — UvA", date:"Sep 2025 – Present",
-     desc:"Graduate focus on machine learning, optimization and end-to-end data science.", long:true},
-    {cat:"work", title:"Teaching Assistant — RUG", date:"Dec 2022 – Mar 2023",
-     desc:"Transformed handwritten lecture notes into clear LaTeX slides; improved student satisfaction and attendance.", long:true},
-    {cat:"edu", title:"BSc Econometrics & Operations Research — RUG", date:"Sep 2021 – Nov 2024",
-     desc:"Thesis on last-mile delivery Vehicle Routing Problem with realistic operational constraints.", long:true},
-    {cat:"course", title:"Big Data (Palantir Foundry)", date:"Jan 2018",
-     desc:"Hands-on big data course using Palantir Foundry; completed with excellence.", long:false},
     {cat:"work", title:"Data Analyst — PM Office", date:"Nov 2016 – Apr 2019",
-     desc:"Performed market research, drove adoption of a new data system, and managed a SQL query library.", long:true}
+     startT: new Date("2016-11-01").getTime(), endT: new Date("2019-04-01").getTime(),
+     desc:"Integrated Palantir and automated reporting pipelines, achieving 100% adoption while accelerating processing by 60% and saving ~30 analyst-hours daily.", long:true},
+
+    {cat:"edu", title:"Big Data (Palantir Foundry)", date:"Jan 2018",
+     startT: new Date("2018-01-15").getTime(), endT: new Date("2018-01-15").getTime(),
+     desc:"Hands-on big data course using Palantir Foundry; completed with excellence.", long:false},
+
+    {cat: "edu", title: "Rimon Music School – Music Production", date: "Sep 2020 – Jul 2021",
+     startT: new Date("2020-09-01").getTime(), endT: new Date("2021-07-01").getTime(),
+     desc: "Music Production in Tel Aviv IL", long: true},
+
+    {cat:"edu", title:"BSc Econometrics & Operations Research — RUG", date:"Sep 2021 – Nov 2024",
+     startT: new Date("2021-09-01").getTime(), endT: new Date("2024-11-01").getTime(),
+     desc:"Thesis: Container Sequencing in Temporary Hubs - Cargo Bike Logistics", long:true},
+
+    {cat:"work", title:"Teaching Assistant — RUG", date:"Dec 2022 – Mar 2023",
+     startT: new Date("2022-12-01").getTime(), endT: new Date("2023-03-01").getTime(),
+     desc:"Transformed handwritten lecture notes into clear LaTeX slides; improved student satisfaction and attendance.", long:true},
+
+    {cat:"work", title:"Founder — commgro.com", date:"Aug 2024 – Aug 2025",
+     startT: new Date("2024-08-01").getTime(), endT: new Date("2025-08-01").getTime(),
+     desc:"Founded an online creators community-building platform connecting fans and students with creators (e.g., filmmaking tutorials) on skool.com", long:true},
+
+    {cat:"edu", title:"SQL for Data Science — IBM (edX)", date:"30 Sep 2025",
+     startT: new Date("2025-09-30").getTime(), endT: new Date("2025-09-30").getTime(),
+     desc:`Completed with certification.<br><a href="https://www.credly.com/badges/50f596d6-b204-4560-b210-a4e689f6ce4e" target="_blank">Certificate link</a>`, long:false},
+
+    {cat:"edu", title:"MSc Business Analytics and Data Science — UvA", date:"Sep 2025 – Present",
+     startT: new Date("2025-09-01").getTime(), endT: new Date("2026-06-30").getTime(),
+     desc:"Thesis: Optimizing Retrieval Pipelines for Financial RAG", long:true},
+
+    {cat:"work", title:"Intern Cognitive Data Scientist, IFF", date:"Feb 2026 – Present",
+     startT: new Date("2026-02-01").getTime(), endT: new Date("2026-06-30").getTime(),
+     desc:"Business Automation of statistical pipelines; using Python, R, and VBA", long:true},
+
+    {cat: "edu", title: "Python Object-Oriented Programming", date: "Feb 2026",
+     startT: new Date("2026-02-15").getTime(), endT: new Date("2026-02-15").getTime(),
+     desc: `I refreshed my OOP skills! <br><a href="https://www.linkedin.com/learning/certificates/28a51bf008bb33bb2d79216bc987352ceff073a900db8c9eaa3ad331bec2e7b0" target="_blank">Certificate link</a>`, long: false}
   ];
 
-  const timeline = document.getElementById("timeline");
-  const Rx = 410;  // ellipse radii
-  const Ry = 180;
-  const cx = 500;  // virtual center
-  const cy = 260;
+  const minYear = 2016;
+  const maxYear = 2027; // gives some padding
+  const minTime = new Date(`${minYear}-01-01`).getTime();
+  const maxTime = new Date(`${maxYear}-01-01`).getTime();
 
+  // Non-linear Compressor map
+  const allDates = new Set();
+  events.forEach(ev => {
+    allDates.add(ev.startT);
+    if (ev.long) allDates.add(ev.endT);
+  });
+  for(let yr = minYear; yr <= maxYear; yr++) {
+    allDates.add(new Date(`${yr}-01-01`).getTime());
+  }
+  const T = Array.from(allDates).sort((a,b) => a - b).filter(t => t >= minTime && t <= maxTime);
+
+  const blend = 0.45; // slightly more linear bias
+  const mappedM = T.map((t, i) => {
+    const Lraw = (t - minTime) / (maxTime - minTime);
+    // EXPAND later years: Math.pow with > 1 pushes early years into a shorter space
+    const L = Math.pow(Lraw, 1.6);
+    
+    // Slight ordinal adjustment to help bunchings
+    const O = Math.pow(i / (T.length - 1), 1.15);
+    
+    return blend * O + (1 - blend) * L;
+  });
+
+  function timeToRatio(t) {
+    if (t <= minTime) return 0;
+    if (t >= maxTime) return 1;
+    for (let i = 0; i < T.length - 1; i++) {
+      if (t >= T[i] && t <= T[i+1]) {
+        const localRatio = (t - T[i]) / (T[i+1] - T[i]);
+        return mappedM[i] + localRatio * (mappedM[i+1] - mappedM[i]);
+      }
+    }
+    return 1;
+  }
+
+  // Draw Horizontal Snake path (Left to Right)
+  const svgWidth = 1200;
+  const svgHeight = 460;
+  const padX = 60;
+  const padY = 60;
+  const cols = 9; 
+  const colW = (svgWidth - 2 * padX) / (cols - 1);
+  let d = `M ${padX} ${padY}`;
+  let downward = true;
+  let x = padX;
+  const r = colW / 2;
+
+  for (let i = 0; i < cols; i++) {
+    const yDest = downward ? svgHeight - padY : padY;
+    if (i < cols - 1) {
+      const yLineEnd = downward ? yDest - r : yDest + r;
+      d += ` L ${x} ${yLineEnd}`;
+      
+      if (downward) {
+        // Curve to the Right
+        d += ` A ${r} ${r} 0 0 0 ${x + r} ${yDest}`;
+        d += ` A ${r} ${r} 0 0 0 ${x + 2*r} ${yDest - r}`;
+      } else {
+        // Curve to the Right
+        d += ` A ${r} ${r} 0 0 1 ${x + r} ${yDest}`;
+        d += ` A ${r} ${r} 0 0 1 ${x + 2*r} ${yDest + r}`;
+      }
+      x += colW;
+    } else {
+      d += ` L ${x} ${yDest}`;
+    }
+    downward = !downward;
+  }
+
+  const basePath = document.getElementById("base-path");
+  const hlPath = document.getElementById("hl-path");
+  basePath.setAttribute("d", d);
+  hlPath.setAttribute("d", d);
+
+  const totalLength = basePath.getTotalLength();
+
+  const timeline = document.getElementById("timeline");
+  const yearGroup = document.getElementById("year-group");
   const dots = [];
   const labels = [];
   let selectedIndex = null;
 
+  // Add Year indicators & small arrows
+  for(let yr = minYear; yr <= maxYear - 1; yr++) {
+    const t = new Date(`${yr}-01-01`).getTime();
+    if(t >= minTime && t <= maxTime) {
+      const rRatio = timeToRatio(t);
+      const pt = basePath.getPointAtLength(rRatio * totalLength);
+      
+      const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      txt.setAttribute("x", pt.x);
+      txt.setAttribute("y", pt.y);
+      txt.setAttribute("class", "year-mark");
+      txt.setAttribute("text-anchor", "middle");
+      txt.setAttribute("dominant-baseline", "central");
+      txt.textContent = yr;
+      yearGroup.appendChild(txt);
+      
+      // Put a small arrow next to it for direction
+      if (yr > minYear && yr < maxYear - 1) {
+        const arr = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        arr.setAttribute("d", "M -5 -4 L 4 0 L -5 4 Z");
+        arr.setAttribute("fill", "#64748b");
+        
+        let arrDist = rRatio * totalLength + 30; // slightly after the year
+        if (arrDist > totalLength) arrDist = rRatio * totalLength - 30;
+        
+        const arrPt = basePath.getPointAtLength(arrDist);
+        const arrPt2 = basePath.getPointAtLength(arrDist + 1);
+        const arrAng = Math.atan2(arrPt2.y - arrPt.y, arrPt2.x - arrPt.x) * 180 / Math.PI;
+        
+        arr.setAttribute("transform", `translate(${arrPt.x}, ${arrPt.y}) rotate(${arrAng})`);
+        yearGroup.appendChild(arr);
+      }
+    }
+  }
+
   // place dots + labels
   events.forEach((ev, i) => {
-    const angle = (i / events.length) * Math.PI * 2 - Math.PI/2;
-    const x = cx + Rx * Math.cos(angle);
-    const y = cy + Ry * Math.sin(angle);
-
-    const labelRadiusX = Rx + 80;
-    const labelRadiusY = Ry + 80;
-    const lx = cx + labelRadiusX * Math.cos(angle);
-    const ly = cy + labelRadiusY * Math.sin(angle);
+    const rStart = timeToRatio(ev.startT);
+    const pt = basePath.getPointAtLength(rStart * totalLength);
 
     const dot = document.createElement("div");
     dot.className = `event-dot dot-${ev.cat}` + (ev.long ? " long" : "");
-    const dotLeft = (x / 1000) * timeline.clientWidth;
-    const dotTop  = (y / 520)  * timeline.clientHeight;
-    dot.style.left = dotLeft + "px";
-    dot.style.top  = dotTop  + "px";
+    dot.style.left = (pt.x / svgWidth * 100) + "%";
+    dot.style.top  = (pt.y / svgHeight * 100) + "%";
     dot.dataset.index = i;
     dot.dataset.cat   = ev.cat;
 
     const label = document.createElement("div");
     label.className = "event-label";
-    const labLeft = (lx / 1000) * timeline.clientWidth;
-    const labTop  = (ly / 520)  * timeline.clientHeight;
-    label.style.left = labLeft + "px";
-    label.style.top  = labTop  + "px";
+    label.style.left = (pt.x / svgWidth * 100) + "%";
+    label.style.top  = (pt.y / svgHeight * 100) + "%";
+    
+    // adjust labels slightly if they fall on an upward stroke, 
+    // to put them on the left side so they don't clip the right edge.
+    // We can infer the column index roughly by tracking X:
+    const colIndex = Math.round((pt.x - padX) / colW);
+    if (colIndex % 2 === 1) {
+      // It's going UP, shift label to the right
+      label.style.transform = "translate(20px, -50%)";
+    } else {
+      // It's going DOWN, shift label to the right
+      // Actually because the snake moves rightward, we always have space on the right (except last col).
+      if (colIndex === cols - 1) {
+        label.style.transform = "translate(calc(-100% - 20px), -50%)";
+        label.style.textAlign = "right";
+      } else {
+        label.style.transform = "translate(20px, -50%)";
+      }
+    }
+    
     label.innerHTML = ev.title;
     label.dataset.index = i;
     label.dataset.cat   = ev.cat;
@@ -339,6 +502,20 @@
     detailTitle.textContent    = ev.title;
     detailDate.textContent     = ev.date;
     detailDesc.innerHTML       = ev.desc;
+
+    // highlight segment if long
+    if (ev.long) {
+      const rStart = timeToRatio(ev.startT);
+      const rEnd = timeToRatio(ev.endT);
+      const dashOffset = rStart * totalLength;
+      const dashLen = (rEnd - rStart) * totalLength;
+      
+      hlPath.style.strokeDasharray = `0 ${dashOffset} ${dashLen} ${totalLength * 2}`;
+      hlPath.style.stroke = conf.color;
+      hlPath.style.opacity = "0.85";
+    } else {
+      hlPath.style.opacity = "0";
+    }
 
     selectedIndex = idx;
   }
